@@ -1,7 +1,6 @@
 package com.example;
 
 import java.io.*;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -22,19 +21,21 @@ public class PetCareScheduler {
     }
 
     private void loadData() {
-        URL resource = getClass().getClassLoader().getResource(FILENAME);
-        assert resource != null;
-        File myObj = new File(resource.getFile());
-
-        // try-with-resources: Scanner will be closed automatically
-        try (Scanner myReader = new Scanner(myObj)) {
-            while (myReader.hasNextLine()) {
-                String data = myReader.nextLine();
-                System.out.println(data);
+        try {
+            FileReader fileReader = new FileReader(FILENAME);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                System.out.println(line);
             }
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
+            bufferedReader.close();
         }
+        catch (FileNotFoundException e) {
+            System.err.println("File not found: " + FILENAME + ", " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + FILENAME + " , " +  e.getMessage());
+        }
+
     }
 
     public void run() {
@@ -330,9 +331,11 @@ public class PetCareScheduler {
 
     private void storeData() {
         System.out.println("==Store the details in a file==");
+
         try {
             FileWriter fileWriter = new FileWriter(FILENAME);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
             pets.forEach((petID, pet) -> {
                 try {
                     bufferedWriter.write(pet.toString());
@@ -341,12 +344,7 @@ public class PetCareScheduler {
                     System.out.println("Error writing to the file: "  + e.getMessage());
                 }
             });
-
-            //flush and closing objects
-            bufferedWriter.flush();
             bufferedWriter.close();
-            fileWriter.flush();
-            fileWriter.close();
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
             System.out.println("Error writing to the file: " + e.getMessage());
@@ -358,6 +356,5 @@ public class PetCareScheduler {
 
 
     }
-
 
 }
