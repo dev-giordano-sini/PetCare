@@ -1,7 +1,7 @@
 package com.example;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -13,17 +13,18 @@ public class PetCareScheduler {
     private final Scanner scanner = new Scanner(System.in);
     private List<PetCareServiceType> actionTypes = new ArrayList<>(Arrays.asList(PetCareServiceType.values()));
     private HashMap<String, Pet> pets = new HashMap<>();
-    private static final String FILENAME = "";
+    private static final String FILENAME = "pets.txt";
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public PetCareScheduler() {
         loadData();
-        run();
     }
 
     private void loadData() {
-        File myObj = new File(FILENAME);
+        URL resource = getClass().getClassLoader().getResource(FILENAME);
+        assert resource != null;
+        File myObj = new File(resource.getFile());
 
         // try-with-resources: Scanner will be closed automatically
         try (Scanner myReader = new Scanner(myObj)) {
@@ -329,6 +330,27 @@ public class PetCareScheduler {
 
     private void storeData() {
         System.out.println("==Store the details in a file==");
+        try {
+            FileWriter fileWriter = new FileWriter(FILENAME);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            pets.forEach((petID, pet) -> {
+                try {
+                    bufferedWriter.write(pet.toString());
+                    bufferedWriter.newLine();
+                } catch (IOException e) {
+                    System.out.println("Error writing to the file: "  + e.getMessage());
+                }
+            });
+
+            //flush and closing objects
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            fileWriter.flush();
+            fileWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("Error writing to the file: " + e.getMessage());
+        }
     }
 
     private void generateReports() {
