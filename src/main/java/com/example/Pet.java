@@ -56,24 +56,31 @@ public class Pet {
     }
 
     public String getShortInfo() {
-        return "Pet{" +
-                "ID='" + ID + '\'' +
-                ", name='" + name + '\'' +
-                ", breed='" + breed + '\'' +
-                ", ownerName='" + ownerName + '\'' +
-                ", contactInfo='" + contactInfo + '\'' +
-                '}';
+        return "ID=" + ID + '\n' +
+                ", name=" + name + '\n' +
+                ", breed=" + breed + '\n' +
+                ", ownerName=" + ownerName + '\n' +
+                ", contactInfo=" + contactInfo;
+    }
+
+    public String getInfoToStore() {
+        return "ID=\"" + ID + "\"," +
+                "name=\"" + name + "\"," +
+                "breed=\"" + breed + "\"," +
+                "ownerName=\"" + ownerName + "\"," +
+                "contactInfo=\"" + contactInfo + "\"," +
+                "registrationDate=\"" + registrationDate + "\"";
     }
 
     @Override
     public String toString() {
-        return "Pet{" +
+        return "{" +
                 "ID='" + ID + '\'' +
                 ", name='" + name + '\'' +
                 ", breed='" + breed + '\'' +
                 ", ownerName='" + ownerName + '\'' +
                 ", contactInfo='" + contactInfo + '\'' +
-                ", registrationDate=" + registrationDate +
+                ", registrationDate=" + registrationDate.toString() +
                 ", appointments=" + appointments +
                 '}';
     }

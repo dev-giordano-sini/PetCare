@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class Appointment {
-    private AppointmentType type;
-    private LocalDate date;
-    private LocalTime time;
-    private String note;
+    protected AppointmentType type;
+    protected LocalDate date;
+    protected LocalTime time;
+    protected String note;
 
     public Appointment(AppointmentType type, LocalDate date, LocalTime time, String note) {
         this.type = type;
@@ -34,13 +34,20 @@ public class Appointment {
 
     @Override
     public String toString() {
-        return "Appointment{" +
+        return "{" +
                 "type=" + type +
                 ", date=" + date +
                 ", time=" + time +
                 ", note='" + note + '\'' +
                 '}';
     }
+
+        public String getInfo() {
+            return  "type=" + type +
+                    ", date=" + date +
+                    ", time=" + time +
+                    ", note=" + note;
+        }
 }
 
 

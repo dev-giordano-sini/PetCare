@@ -6,13 +6,13 @@ public enum AppointmentType {
     VACCINATION ("Pet vaccination"),
     GROOMING ("Pet grooming");
 
-    private String descrption;
+    private String description;
 
-    AppointmentType(String descrption) {
-        this.descrption = descrption;
+    AppointmentType(String description) {
+        this.description = description;
     }
 
-    public String getDescrption() {
-        return descrption;
+    public String getDescription() {
+        return description;
     }
 }
