@@ -58,15 +58,9 @@ public class PetCareScheduler {
         petDataLines.forEach(line -> {
             try {
                 Pet pet = parsePet(line);
-                if(pet == null) {
-                    System.out.println("Invalid pet line: " + line);
-                }
-                else {
-                    pets.put(pet.getID(), pet);
-                }
-
+                pets.put(pet.getID(), pet);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                System.out.println("Invalid pet line: " + line);
             }
 
         });
@@ -88,18 +82,12 @@ public class PetCareScheduler {
         appointmentLines.forEach(line -> {
             try {
                 AppointmentWithID appointmentWithID = parseAppointmentWithID(line);
-                if(appointmentWithID == null) {
-                    System.out.println("Invalid appointment line: " + line);
+                String appointmentId = appointmentWithID.getID();
+                if(pets.containsKey(appointmentId)) {
+                    pets.get(appointmentId).setAppointment(appointmentWithID);
                 }
                 else {
-                    String appointmentId = appointmentWithID.getID();
-                    if(pets.containsKey(appointmentId)) {
-                        Appointment appointment = new Appointment(appointmentWithID.getType(), appointmentWithID.getDate(), appointmentWithID.getTime(), appointmentWithID.getNote());
-                        pets.get(appointmentId).setAppointment(appointment);
-                    }
-                    else {
-                        System.out.println("No pet found for the appointment with ID: " + appointmentId);
-                    }
+                    System.out.println("No pet found for the appointment with ID: " + appointmentId);
                 }
             } catch (ParseException e) {
                 System.err.println("Parse appointment line errore: " + line + ", " + e.getMessage());
@@ -368,7 +356,7 @@ public class PetCareScheduler {
                 case DISPLAY_ALL_PETS -> {
                     showPets();
                 }
-                case DISPLAY_PAST_APPONINTMETS -> {
+                case DISPLAY_PAST_APPOINTMENTS -> {
                     showAppointmentsHistory();
                 }
                 case DISPLAY_ALL_APPOINTMENTS_SPECIFIC_PET -> {
@@ -427,7 +415,6 @@ public class PetCareScheduler {
     private void showNextAppointments() {
         System.out.println("==Upcoming appointments for all pets==");
         LocalDate today = LocalDate.now();
-        final Boolean existNextAppointment = new Boolean(false);
         pets.forEach((petID, pet) -> {
             System.out.println("Pet : " + pet.getShortInfo());
             pet.getAppointments().stream().filter(appointment -> appointment.getDate().isAfter(today)).forEach(appointment -> {
