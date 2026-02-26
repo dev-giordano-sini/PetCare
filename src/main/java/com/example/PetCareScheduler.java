@@ -59,14 +59,14 @@ public class PetCareScheduler {
             try {
                 Pet pet = parsePet(line);
                 pets.put(pet.getID(), pet);
-            } catch (Exception e) {
+            } catch (ParseException e) {
                 System.out.println("Invalid pet line: " + line);
             }
 
         });
     }
 
-    private Pet parsePet(String line) throws ParseException, Exception {
+    private Pet parsePet(String line) throws ParseException {
         String[] data = line.split(",");
         String petID = data[0].split("=")[POSITION_VALUE].replace("\"", "");
         String name = data[1].split("=")[POSITION_VALUE].replace("\"", "");
