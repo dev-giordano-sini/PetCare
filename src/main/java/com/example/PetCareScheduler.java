@@ -1,7 +1,6 @@
 package com.example;
 
-import java.io.*;
-import java.text.ParseException;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,9 +12,8 @@ import java.util.*;
 public class PetCareScheduler {
     private static final String PETS_FILENAME = "pets.txt";
     private static final String APPOINTMENT_FILENAME = "appointments.txt";
-    private static final int POSITION_VALUE = 1;
-
     private final Scanner scanner = new Scanner(System.in);
+    private final JsonFileStorage storage = new JsonFileStorage();
     private final List<PetCareServiceType> actionTypes = new ArrayList<>(Arrays.asList(PetCareServiceType.values()));
     private final HashMap<String, Pet> pets = new HashMap<>();
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -26,84 +24,23 @@ public class PetCareScheduler {
     }
 
     private void loadData() {
-        List<String> petLines = loadDataFromFilename(PETS_FILENAME);
-        loadPetData(petLines);
-
-        List<String> appointmentLines = loadDataFromFilename(APPOINTMENT_FILENAME);
-        loadAppointmentData(appointmentLines);
-    }
-
-    private List<String> loadDataFromFilename(String filename) {
-        List<String> lines = new ArrayList<>();
         try {
-            FileReader fileReader = new FileReader(filename);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                lines.add(line);
-            }
-            bufferedReader.close();
-        } catch (FileNotFoundException e) {
-            System.err.println("File not found: " + filename + ", " + e.getMessage());
+            storage.readList(PETS_FILENAME, Pet.class)
+                    .forEach(pet -> pets.put(pet.getID(), pet));
+            storage.readList(APPOINTMENT_FILENAME, AppointmentWithID.class)
+                    .forEach(this::addAppointmentToPet);
         } catch (IOException e) {
-            System.err.println("Error reading file: " + filename + " , " + e.getMessage());
-        }catch (Exception e) {
-            System.err.println("Unexpected error: " + e.getMessage());
+            System.err.println("Error reading JSON data: " + e.getMessage());
         }
-
-        return lines;
     }
 
-    private void loadPetData(List<String> petDataLines) {
-        petDataLines.forEach(line -> {
-            try {
-                Pet pet = parsePet(line);
-                pets.put(pet.getID(), pet);
-            } catch (ParseException e) {
-                System.out.println("Invalid pet line: " + line);
-            }
-
-        });
-    }
-
-    private Pet parsePet(String line) throws ParseException {
-        String[] data = line.split(",");
-        String petID = data[0].split("=")[POSITION_VALUE].replace("\"", "");
-        String name = data[1].split("=")[POSITION_VALUE].replace("\"", "");
-        String breed = data[2].split("=")[POSITION_VALUE].replace("\"", "");
-        String ownerName = data[3].split("=")[POSITION_VALUE].replace("\"", "");
-        String contactInfo = data[4].split("=")[POSITION_VALUE].replace("\"", "");
-        LocalDate registrationDate = LocalDate.parse(data[5].split("=")[POSITION_VALUE].trim().replace("\"", ""), dateFormatter);
-
-        return new Pet(petID, name, breed, ownerName, contactInfo, registrationDate);
-    }
-
-    private void loadAppointmentData(List<String> appointmentLines) {
-        appointmentLines.forEach(line -> {
-            try {
-                AppointmentWithID appointmentWithID = parseAppointmentWithID(line);
-                String appointmentId = appointmentWithID.getID();
-                if(pets.containsKey(appointmentId)) {
-                    pets.get(appointmentId).setAppointment(appointmentWithID);
-                }
-                else {
-                    System.out.println("No pet found for the appointment with ID: " + appointmentId);
-                }
-            } catch (ParseException e) {
-                System.err.println("Parse appointment line errore: " + line + ", " + e.getMessage());
-            }
-        });
-    }
-
-    private AppointmentWithID parseAppointmentWithID(String line) throws ParseException {
-        String[] data = line.split(",");
-        String petID = data[0].split("=")[POSITION_VALUE].replace("\"", "");
-        AppointmentType type = AppointmentType.valueOf(data[1].split("=")[POSITION_VALUE].replace("\"", ""));
-        LocalDate date = LocalDate.parse(data[2].split("=")[POSITION_VALUE].trim().replace("\"", ""), dateFormatter);
-        LocalTime time = LocalTime.parse(data[3].split("=")[POSITION_VALUE].trim().replace("\"", ""), timeFormatter);
-        String note = data[4].split("=")[POSITION_VALUE].replace("\"", "");
-
-        return new  AppointmentWithID(petID, type, date, time, note);
+    private void addAppointmentToPet(AppointmentWithID appointment) {
+        Pet pet = pets.get(appointment.getID());
+        if (pet != null) {
+            pet.setAppointment(appointment);
+        } else {
+            System.out.println("No pet found for the appointment with ID: " + appointment.getID());
+        }
     }
 
 
@@ -438,37 +375,17 @@ public class PetCareScheduler {
         System.out.println("==Store the details in a file==");
 
         try {
-            FileWriter filePetWriter = new FileWriter(PETS_FILENAME);
+            List<Pet> petsToStore = new ArrayList<>(pets.values());
+            List<AppointmentWithID> appointmentsToStore = new ArrayList<>();
+            pets.forEach((petID, pet) -> pet.getAppointments().forEach(appointment ->
+                    appointmentsToStore.add(new AppointmentWithID(petID, appointment.getType(),
+                            appointment.getDate(), appointment.getTime(), appointment.getNote()))));
 
-            BufferedWriter bufferedPetWriter = new BufferedWriter(filePetWriter);
-
-            FileWriter fileAppointmentWriter = new FileWriter(APPOINTMENT_FILENAME);
-            BufferedWriter bufferedAppointmentWriter = new BufferedWriter(fileAppointmentWriter);
-
-            pets.forEach((petID, pet) -> {
-                try {
-                    bufferedPetWriter.write(pet.getInfoToStore());
-                    bufferedPetWriter.newLine();
-                } catch (IOException e) {
-                    System.out.println("Error writing to the file (" + PETS_FILENAME + "): " + e.getMessage());
-                }
-
-                pet.getAppointments().forEach(appointment -> {
-                    try {
-                        AppointmentWithID appointmentWithID = new AppointmentWithID(petID, appointment.getType(), appointment.getDate(), appointment.getTime(), appointment.getNote());
-                        bufferedAppointmentWriter.write(appointmentWithID.getInfoToStore());
-                        bufferedAppointmentWriter.newLine();
-                    } catch (IOException e) {
-                        System.out.println("Error writing to the file (" + APPOINTMENT_FILENAME + "): " + e.getMessage());
-                    }
-                });
-
-            });
-
-            bufferedPetWriter.close();
-            bufferedAppointmentWriter.close();;
+            storage.writeList(PETS_FILENAME, petsToStore);
+            storage.writeList(APPOINTMENT_FILENAME, appointmentsToStore);
         } catch (IOException e) {
-            System.out.println("Error writing to the file: " + e.getMessage());
+            System.out.println("Error writing JSON data: " + e.getMessage());
+            return;
         }
 
         System.out.println("**Successfully wrote the files.");
