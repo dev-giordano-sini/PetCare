@@ -25,9 +25,11 @@ public class PetCareScheduler {
 
     private void loadData() {
         try {
-            storage.readList(PETS_FILENAME, Pet.class)
+            storage.readList(PETS_FILENAME, Pet.class,
+                            "id", "name", "breed", "ownerName", "contactInfo", "registrationDate")
                     .forEach(pet -> pets.put(pet.getID(), pet));
-            storage.readList(APPOINTMENT_FILENAME, AppointmentWithID.class)
+            storage.readList(APPOINTMENT_FILENAME, AppointmentWithID.class,
+                            "id", "type", "date", "time", "note")
                     .forEach(this::addAppointmentToPet);
         } catch (IOException e) {
             System.err.println("Error reading JSON data: " + e.getMessage());
@@ -381,8 +383,8 @@ public class PetCareScheduler {
                     appointmentsToStore.add(new AppointmentWithID(petID, appointment.getType(),
                             appointment.getDate(), appointment.getTime(), appointment.getNote()))));
 
-            storage.writeList(PETS_FILENAME, petsToStore);
-            storage.writeList(APPOINTMENT_FILENAME, appointmentsToStore);
+            storage.writeListsAtomically(PETS_FILENAME, petsToStore,
+                    APPOINTMENT_FILENAME, appointmentsToStore);
         } catch (IOException e) {
             System.out.println("Error writing JSON data: " + e.getMessage());
             return;
