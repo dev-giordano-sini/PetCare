@@ -1,5 +1,9 @@
 package com.example;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +18,13 @@ public class Pet {
     private final LocalDate registrationDate;
     private final List<Appointment> appointments = new ArrayList<>();
 
-    public Pet(String ID, String name, String breed, String ownerName, String contactInfo, LocalDate registrationDate) {
+    @JsonCreator
+    public Pet(@JsonProperty("id") String ID,
+               @JsonProperty("name") String name,
+               @JsonProperty("breed") String breed,
+               @JsonProperty("ownerName") String ownerName,
+               @JsonProperty("contactInfo") String contactInfo,
+               @JsonProperty("registrationDate") LocalDate registrationDate) {
         this.ID = ID;
         this.name = name;
         this.breed = breed;
@@ -23,6 +33,7 @@ public class Pet {
         this.registrationDate = registrationDate;
     }
 
+    @JsonProperty("id")
     public String getID() {
         return ID;
     }
@@ -47,6 +58,7 @@ public class Pet {
         return registrationDate;
     }
 
+    @JsonIgnore
     public List<Appointment> getAppointments() {
         return appointments;
     }
@@ -55,21 +67,13 @@ public class Pet {
         this.appointments.add(appointment);
     }
 
+    @JsonIgnore
     public String getShortInfo() {
         return "ID=" + ID + '\n' +
                 ", name=" + name + '\n' +
                 ", breed=" + breed + '\n' +
                 ", ownerName=" + ownerName + '\n' +
                 ", contactInfo=" + contactInfo;
-    }
-
-    public String getInfoToStore() {
-        return "ID=\"" + ID + "\"," +
-                "name=\"" + name + "\"," +
-                "breed=\"" + breed + "\"," +
-                "ownerName=\"" + ownerName + "\"," +
-                "contactInfo=\"" + contactInfo + "\"," +
-                "registrationDate=\"" + registrationDate + "\"";
     }
 
     @Override
@@ -85,4 +89,3 @@ public class Pet {
                 '}';
     }
 }
-

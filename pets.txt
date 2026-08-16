@@ -1,1 +1,10 @@
-ID="1",name="bob",breed="yorkshire",ownerName="Mario",contactInfo="xxx",registrationDate="2025-01-01"
+[
+  {
+    "id": "1",
+    "name": "bob",
+    "breed": "yorkshire",
+    "ownerName": "Mario",
+    "contactInfo": "xxx",
+    "registrationDate": "2025-01-01"
+  }
+]

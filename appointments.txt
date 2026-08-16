@@ -1,4 +1,6 @@
-ID="1",type="VACCINATION",date="2021-03-03",time="11:00",note="none"
-ID="1",type="GROOMING",date="2026-03-10",time="11:00",note="none"
-ID="1",type="GROOMING",date="2026-02-02",time="09:00",note="cut hair"
-ID="1",type="GROOMING",date="2026-02-02",time="09:00",note="cut hair"
+[
+  { "id": "1", "type": "VACCINATION", "date": "2021-03-03", "time": "11:00", "note": "none" },
+  { "id": "1", "type": "GROOMING", "date": "2026-03-10", "time": "11:00", "note": "none" },
+  { "id": "1", "type": "GROOMING", "date": "2026-02-02", "time": "09:00", "note": "cut hair" },
+  { "id": "1", "type": "GROOMING", "date": "2026-02-02", "time": "09:00", "note": "cut hair" }
+]

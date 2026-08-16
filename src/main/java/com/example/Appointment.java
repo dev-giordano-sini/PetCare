@@ -1,5 +1,7 @@
 package com.example;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -42,14 +44,11 @@ public class Appointment {
                 '}';
     }
 
-        public String getInfo() {
-            return  "type=" + type +
-                    ", date=" + date +
-                    ", time=" + time +
-                    ", note=" + note;
-        }
+    @JsonIgnore
+    public String getInfo() {
+        return  "type=" + type +
+                ", date=" + date +
+                ", time=" + time +
+                ", note=" + note;
+    }
 }
-
-
-
-

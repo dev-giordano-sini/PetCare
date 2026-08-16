@@ -1,16 +1,25 @@
 package com.example;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class AppointmentWithID extends Appointment {
     protected String ID;
 
-    public AppointmentWithID(String ID, AppointmentType type, LocalDate date, LocalTime time, String note) {
+    @JsonCreator
+    public AppointmentWithID(@JsonProperty("id") String ID,
+                             @JsonProperty("type") AppointmentType type,
+                             @JsonProperty("date") LocalDate date,
+                             @JsonProperty("time") LocalTime time,
+                             @JsonProperty("note") String note) {
         super(type, date, time, note);
         this.ID = ID;
     }
 
+    @JsonProperty("id")
     public String getID() {
         return ID;
     }
@@ -24,13 +33,5 @@ public class AppointmentWithID extends Appointment {
                 ", time=" + time +
                 ", note='" + note + '\'' +
                 '}';
-    }
-
-    public String getInfoToStore() {
-        return  "ID=\"" + ID + "\","
-                + "type=\"" + type + "\","
-                + "date=\"" + date + "\","
-                + "time=\"" + time + "\","
-                +  "note=\"" + note + "\"";
     }
 }
